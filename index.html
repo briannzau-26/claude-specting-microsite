@@ -40,7 +40,7 @@ nav {
   padding: 0 28px;
 }
 .nav-logo { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 14px; color: var(--black); text-decoration: none; flex-shrink: 0; }
-.nav-dot { width: 24px; height: 24px; background: var(--red); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+.nav-logo-mark { width: 26px; height: 26px; display: block; flex-shrink: 0; }
 .nav-links { display: flex; gap: 1px; list-style: none; align-items: center; overflow-x: auto; scrollbar-width: none; }
 .nav-links::-webkit-scrollbar { display: none; }
 .nav-links a { font-size: 12px; font-weight: 500; color: var(--gray-70); text-decoration: none; padding: 6px 9px; border-radius: 6px; white-space: nowrap; transition: background .15s, color .15s; }
@@ -267,7 +267,11 @@ footer strong { color: var(--red); }
 
 <nav id="top">
   <a class="nav-logo" href="#top">
-    <span class="nav-dot">E</span>
+    <svg class="nav-logo-mark" viewBox="0 0 100 100" role="img" aria-label="Envoy">
+      <rect x="6" y="6" width="88" height="88" rx="20" fill="none" stroke="#E8002D" stroke-width="9"/>
+      <path d="M64 32 L38 32 L38 68 L64 68" fill="none" stroke="#E8002D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M38 50 L60 50" fill="none" stroke="#E8002D" stroke-width="9" stroke-linecap="round"/>
+    </svg>
     Claude-specting
   </a>
   <ul class="nav-links">
