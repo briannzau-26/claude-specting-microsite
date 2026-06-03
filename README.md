@@ -28,3 +28,5 @@ Every copyable prompt appears **twice**: once as visible card text and once in a
 This is a static single-file site, so migration is low effort: point an **AWS Amplify Gen 2** app at this repo and let it use the included `amplify.yml`. There is no build step and no code changes are required. The spec declares no build commands and publishes the repo root (where `index.html` lives) as the artifact directory.
 
 Hosting currently runs on GitHub Pages and can cut over to Amplify under the Envoy org whenever infra (Tanya / Ani) is ready. Nothing in the site depends on the host, so the cutover is purely a DNS / hosting change.
+
+Link - https://briannzau-26.github.io/claude-specting-microsite/
