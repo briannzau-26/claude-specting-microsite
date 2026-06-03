@@ -1,0 +1,15 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands: []
+    build:
+      commands: []
+  artifacts:
+    # Static single-file site: index.html lives at the repo root and is served as-is.
+    # No build step. The repo root is the publish directory.
+    baseDirectory: /
+    files:
+      - '**/*'
+  cache:
+    paths: []

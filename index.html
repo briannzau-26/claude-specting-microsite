@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude-specting | Envoy Prospecting Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #E8002D;
+  --red-dark: #B8001F;
+  --red-light: #FF1A45;
+  --red-muted: #FFF0F2;
+  --black: #0D0D0D;
+  --gray-70: #3D3D3D;
+  --gray-50: #787878;
+  --gray-30: #B5B5B5;
+  --gray-15: #E5E5E5;
+  --gray-10: #F4F4F4;
+  --white: #FFFFFF;
+  --body: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --r: 10px;
+  --rl: 14px;
+  --nav-h: 56px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body { font-family: var(--body); background: var(--white); color: var(--black); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #EBEBEB;
+  height: var(--nav-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+}
+.nav-logo { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 14px; color: var(--black); text-decoration: none; flex-shrink: 0; }
+.nav-dot { width: 24px; height: 24px; background: var(--red); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+.nav-links { display: flex; gap: 1px; list-style: none; align-items: center; overflow-x: auto; scrollbar-width: none; }
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links a { font-size: 12px; font-weight: 500; color: var(--gray-70); text-decoration: none; padding: 6px 9px; border-radius: 6px; white-space: nowrap; transition: background .15s, color .15s; }
+.nav-links a:hover { background: var(--gray-10); color: var(--black); }
+.nav-cta { background: var(--red) !important; color: white !important; font-weight: 700 !important; border-radius: 7px !important; }
+.nav-cta:hover { background: var(--red-dark) !important; }
+.hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 6px; border-radius: 6px; }
+.hamburger span { display: block; width: 22px; height: 2px; background: var(--black); border-radius: 2px; transition: transform .2s, opacity .2s; }
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-menu { display: none; position: fixed; top: var(--nav-h); left: 0; right: 0; background: white; border-bottom: 1px solid #EBEBEB; z-index: 199; padding: 10px 14px 18px; flex-direction: column; gap: 2px; box-shadow: 0 8px 24px rgba(0,0,0,.09); }
+.mobile-menu.open { display: flex; }
+.mobile-menu a { font-size: 14px; font-weight: 500; color: var(--gray-70); text-decoration: none; padding: 10px 12px; border-radius: 8px; transition: background .15s; }
+.mobile-menu a:hover { background: var(--gray-10); }
+.mobile-menu .mob-cta { background: var(--red); color: white !important; font-weight: 700; text-align: center; margin-top: 6px; border-radius: 8px; }
+.mobile-menu .mob-cta:hover { background: var(--red-dark); }
+
+[id] { scroll-margin-top: calc(var(--nav-h) + 12px); }
+
+.wrap { padding: 72px 40px; max-width: 1100px; margin: 0 auto; }
+.divider { height: 1px; background: #EBEBEB; max-width: 1100px; margin: 0 auto; }
+
+.slabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--red); margin-bottom: 7px; }
+.stitle { font-size: 28px; font-weight: 800; line-height: 1.18; margin-bottom: 9px; letter-spacing: -.3px; }
+.ssub { color: var(--gray-50); font-size: 15px; max-width: 540px; line-height: 1.6; }
+.sh { margin-bottom: 36px; }
+
+.hero { background: var(--black); padding: 88px 40px 72px; text-align: center; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -60px; right: -80px; width: 420px; height: 420px; background: radial-gradient(circle, rgba(232,0,45,.32) 0%, transparent 70%); pointer-events: none; }
+.hero::after  { content: ''; position: absolute; bottom: -80px; left: -40px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(232,0,45,.16) 0%, transparent 70%); pointer-events: none; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(232,0,45,.15); border: 1px solid rgba(232,0,45,.35); color: #FF7090; font-size: 11px; font-weight: 700; padding: 4px 13px; border-radius: 100px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 24px; position: relative; z-index: 1; }
+.hero h1 { font-size: clamp(34px,5.5vw,62px); font-weight: 800; color: white; line-height: 1.08; margin-bottom: 18px; letter-spacing: -.5px; position: relative; z-index: 1; }
+.hero h1 em { color: var(--red); font-style: normal; }
+.hero-sub { font-size: 17px; color: rgba(255,255,255,.58); max-width: 520px; margin: 0 auto 30px; line-height: 1.6; position: relative; z-index: 1; }
+.hero-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+.btn-p { background: var(--red); color: white; border: none; padding: 12px 26px; border-radius: 8px; font-family: var(--body); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: background .15s, transform .1s; }
+.btn-p:hover { background: var(--red-light); transform: translateY(-1px); }
+.btn-g { background: transparent; color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.2); padding: 12px 26px; border-radius: 8px; font-family: var(--body); font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-block; transition: border-color .15s, color .15s; }
+.btn-g:hover { border-color: rgba(255,255,255,.45); color: white; }
+
+.wi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+.wi-left h2 { font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 14px; letter-spacing: -.2px; }
+.wi-left p { color: var(--gray-70); margin-bottom: 18px; font-size: 14.5px; line-height: 1.65; }
+.cap-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.cap-tag { background: var(--gray-10); color: var(--gray-70); border: 1px solid var(--gray-15); padding: 5px 11px; border-radius: 100px; font-size: 12.5px; font-weight: 500; }
+.wi-right { background: var(--gray-10); border-radius: var(--rl); padding: 24px; border: 1px solid var(--gray-15); }
+.src-block { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #E8E8E8; }
+.src-block:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.src-lbl { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--gray-50); margin-bottom: 8px; }
+.src-item { font-size: 13px; color: var(--gray-70); display: flex; align-items: flex-start; gap: 8px; line-height: 1.45; margin-bottom: 5px; }
+.src-item::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--red); flex-shrink: 0; margin-top: 6px; }
+
+.paths { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.path-card { border: 1.5px solid var(--gray-15); border-radius: var(--rl); padding: 24px; background: white; display: flex; flex-direction: column; transition: border-color .2s, box-shadow .2s; }
+.path-card:hover { border-color: var(--red); box-shadow: 0 0 0 3px rgba(232,0,45,.05); }
+.path-icon { width: 38px; height: 38px; background: var(--red-muted); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 14px; flex-shrink: 0; }
+.path-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+.path-ask { background: var(--gray-10); border-radius: 7px; padding: 11px 13px; margin-bottom: 10px; font-family: var(--mono); font-size: 11.5px; color: var(--gray-70); line-height: 1.55; border-left: 3px solid var(--red); flex: 1; }
+.path-gives { font-size: 12.5px; color: var(--gray-50); margin-bottom: 8px; line-height: 1.5; }
+.path-why { font-size: 12px; font-weight: 600; color: var(--red); margin-bottom: 14px; }
+
+.copy-btn {
+  background: none; border: 1.5px solid var(--gray-15); color: var(--gray-70);
+  padding: 7px 14px; border-radius: 7px; font-family: var(--body); font-size: 12px;
+  font-weight: 600; cursor: pointer; transition: border-color .15s, color .15s, background .15s;
+  width: 100%;
+}
+.copy-btn:hover { border-color: var(--red); color: var(--red); }
+.copy-btn.copied { background: var(--red-muted); border-color: var(--red); color: var(--red); }
+
+.copy-btn-inline {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+  color: rgba(255,255,255,.55); padding: 4px 9px; border-radius: 5px;
+  font-family: var(--body); font-size: 11px; font-weight: 500;
+  cursor: pointer; transition: background .15s, color .15s; white-space: nowrap;
+}
+.copy-btn-inline:hover { background: rgba(255,255,255,.18); color: white; }
+.copy-btn-inline.copied { background: rgba(50,200,100,.2); color: #5FE88A; border-color: rgba(50,200,100,.3); }
+
+.tab-nav { display: flex; gap: 1px; flex-wrap: wrap; border-bottom: 1px solid var(--gray-15); margin-bottom: 26px; }
+.tab-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 9px 13px; font-family: var(--body); font-size: 12.5px; font-weight: 500; color: var(--gray-50); cursor: pointer; margin-bottom: -1px; white-space: nowrap; transition: color .15s, border-color .15s; }
+.tab-btn:hover:not(.active) { color: var(--black); }
+.tab-btn.active { color: var(--red); border-bottom-color: var(--red); font-weight: 700; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.uc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+.uc-left h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; line-height: 1.25; letter-spacing: -.2px; }
+.uc-left p { color: var(--gray-70); font-size: 14px; line-height: 1.65; margin-bottom: 16px; }
+.uc-plabel { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-50); margin-bottom: 7px; }
+.uc-prompt { background: var(--black); color: #A8FFC4; padding: 14px 14px 14px 14px; border-radius: 9px; font-family: var(--mono); font-size: 12px; line-height: 1.55; position: relative; padding-right: 68px; }
+.uc-right { background: var(--gray-10); border: 1px solid var(--gray-15); border-radius: var(--rl); padding: 22px; }
+.uc-olabel { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-50); margin-bottom: 12px; }
+.uc-item { display: flex; gap: 9px; align-items: flex-start; margin-bottom: 8px; font-size: 13px; color: var(--gray-70); line-height: 1.45; }
+.uc-item::before { content: '✓'; color: var(--red); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+.org-tips { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 26px; }
+.org-tip { background: white; border: 1.5px solid var(--gray-15); border-radius: var(--r); padding: 20px; }
+.org-tip-n { font-size: 26px; font-weight: 800; color: var(--red); line-height: 1; margin-bottom: 7px; }
+.org-tip h4 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+.org-tip p { font-size: 13px; color: var(--gray-50); line-height: 1.5; }
+.org-rows { display: flex; flex-direction: column; gap: 9px; }
+.org-row { display: flex; align-items: center; gap: 12px; background: var(--gray-10); border: 1px solid var(--gray-15); border-left: 3px solid var(--red); border-radius: 8px; padding: 12px 14px; }
+.org-row-text { flex: 1; font-family: var(--mono); font-size: 12px; color: var(--gray-70); line-height: 1.45; }
+.org-row .copy-btn { width: auto; padding: 5px 11px; flex-shrink: 0; font-size: 11px; }
+
+.track-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.track-card { border-radius: var(--rl); padding: 28px; border: 1.5px solid var(--gray-15); }
+.track-card.fast { background: #FFF8F0; border-color: #FFCCD5; }
+.track-card.value { background: #F4F6FF; border-color: #C8CFFF; }
+.track-badge { display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; padding: 4px 10px; border-radius: 100px; margin-bottom: 14px; }
+.fast .track-badge { background: var(--red); color: white; }
+.value .track-badge { background: #4D52C8; color: white; }
+.track-card h3 { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+.track-intro { font-size: 13px; color: var(--gray-50); margin-bottom: 14px; line-height: 1.5; font-style: italic; }
+.track-sigs { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.track-sigs li { font-size: 13px; color: var(--gray-70); display: flex; gap: 8px; align-items: flex-start; line-height: 1.4; }
+.track-sigs li::before { content: '→'; font-weight: 600; flex-shrink: 0; }
+.fast .track-sigs li::before { color: var(--red); }
+.value .track-sigs li::before { color: #4D52C8; }
+.track-note { margin-top: 14px; padding: 12px 14px; background: rgba(255,255,255,.65); border-radius: 8px; font-size: 12.5px; color: var(--gray-70); line-height: 1.5; border: 1px solid rgba(0,0,0,.05); }
+.track-note strong { font-weight: 700; color: var(--black); }
+.track-prompt-box { margin-top: 12px; background: rgba(255,255,255,.5); border-radius: 8px; padding: 11px 13px; font-family: var(--mono); font-size: 11.5px; color: var(--gray-70); border: 1px solid rgba(0,0,0,.05); line-height: 1.5; }
+
+.ways { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 14px; }
+.way-card { border: 1.5px solid var(--gray-15); border-radius: var(--rl); padding: 22px; background: white; display: flex; flex-direction: column; gap: 9px; transition: border-color .18s, box-shadow .18s; }
+.way-card:hover { border-color: var(--red); box-shadow: 0 0 0 3px rgba(232,0,45,.05); }
+.way-num { font-size: 12px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: .06em; }
+.way-card h4 { font-size: 14.5px; font-weight: 700; line-height: 1.3; }
+.way-card p { font-size: 13px; color: var(--gray-50); line-height: 1.5; }
+.way-prompt { background: var(--gray-10); border-left: 3px solid var(--red); border-radius: 6px; padding: 10px 12px; font-family: var(--mono); font-size: 11px; color: var(--gray-70); line-height: 1.5; }
+
+.hunt-bg { background: var(--black); padding: 72px 40px; }
+.hunt-in { max-width: 1100px; margin: 0 auto; }
+.hunt-hdr { text-align: center; margin-bottom: 44px; }
+.hunt-badge { display: inline-block; background: rgba(232,0,45,.18); border: 1px solid rgba(232,0,45,.35); color: #FF7090; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 4px 12px; border-radius: 100px; margin-bottom: 16px; }
+.hunt-hdr h2 { font-size: 32px; font-weight: 800; color: white; margin-bottom: 10px; letter-spacing: -.3px; }
+.hunt-hdr p { color: rgba(255,255,255,.48); font-size: 15px; }
+.hunt-prog { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 15px 20px; margin-bottom: 38px; }
+.prog-lbl { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.48); white-space: nowrap; }
+.prog-wrap { flex: 1; height: 5px; background: rgba(255,255,255,.08); border-radius: 100px; overflow: hidden; }
+.prog-bar { height: 100%; background: var(--red); border-radius: 100px; width: 0%; transition: width .4s ease; }
+.prog-count { font-size: 13px; font-weight: 700; color: white; white-space: nowrap; }
+.hunt-levels { display: flex; flex-direction: column; gap: 34px; }
+.hlvl-hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.lvl-badge { border: 1px solid rgba(255,255,255,.12); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; padding: 4px 11px; border-radius: 100px; color: white; background: rgba(255,255,255,.06); }
+.lv1 .lvl-badge { border-color: rgba(232,0,45,.5); color: #FF7090; }
+.lv2 .lvl-badge { border-color: rgba(255,190,0,.5); color: #FFD166; }
+.lv3 .lvl-badge { border-color: rgba(100,220,150,.5); color: #6EE7B7; }
+.hlvl-hdr h3 { font-size: 18px; font-weight: 700; color: white; }
+.hunt-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 13px; }
+.hcard { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09); border-radius: var(--rl); padding: 20px; cursor: pointer; transition: border-color .2s, background .2s; user-select: none; }
+.hcard:hover { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.16); }
+.hcard.done { background: rgba(50,200,100,.07); border-color: rgba(50,200,100,.25); }
+.hcard-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.hcard h4 { font-size: 14px; font-weight: 700; color: white; line-height: 1.3; flex: 1; margin-right: 10px; }
+.hcheck { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; color: white; transition: background .15s, border-color .15s; }
+.hcard.done .hcheck { background: #32C864; border-color: #32C864; }
+.hprompt { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.07); border-radius: 8px; padding: 11px 50px 11px 12px; font-family: var(--mono); font-size: 11px; color: #A8FFC4; line-height: 1.5; margin-bottom: 11px; position: relative; }
+.hcopy { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.09); color: rgba(255,255,255,.4); font-family: var(--body); font-size: 10px; padding: 3px 8px; border-radius: 4px; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; }
+.hcopy:hover { background: rgba(255,255,255,.12); color: rgba(255,255,255,.75); }
+.hcopy.copied { background: rgba(50,200,100,.2); color: #6EE7B7; border-color: rgba(50,200,100,.25); }
+.hsucc { font-size: 12px; color: rgba(255,255,255,.36); margin-bottom: 5px; }
+.hsucc strong { color: #6EE7B7; }
+.hwhy { font-size: 11px; color: rgba(255,255,255,.26); font-style: italic; }
+
+.plib { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 12px; }
+.pcard { background: white; border: 1.5px solid var(--gray-15); border-radius: var(--rl); padding: 18px; display: flex; flex-direction: column; transition: border-color .18s, box-shadow .18s; }
+.pcard:hover { border-color: var(--red); box-shadow: 0 0 0 3px rgba(232,0,45,.05); }
+.pcat { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--red); margin-bottom: 5px; }
+.ptitle { font-size: 13.5px; font-weight: 700; margin-bottom: 9px; line-height: 1.3; }
+.ptext { background: var(--gray-10); border: 1px solid var(--gray-15); border-left: 3px solid var(--red); border-radius: 7px; padding: 11px 13px; font-family: var(--mono); font-size: 11px; color: var(--gray-70); line-height: 1.55; margin-bottom: 11px; flex: 1; }
+
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.dos-card { border-radius: var(--rl); padding: 26px; border: 1.5px solid var(--gray-15); }
+.dos-card.do  { background: #F2FBF5; border-color: #BBE9CA; }
+.dos-card.not { background: #FFF5F6; border-color: #FFCCD5; }
+.dos-hdr { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
+.dos-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.do  .dos-icon { background: #D1F5DE; }
+.not .dos-icon { background: #FFCCD5; }
+.dos-hdr h3 { font-size: 14px; font-weight: 800; }
+.dos-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.dos-list li { font-size: 13px; color: var(--gray-70); display: flex; gap: 8px; align-items: flex-start; line-height: 1.45; }
+.do  .dos-list li::before { content: '✓'; color: #1A9E4A; font-weight: 700; flex-shrink: 0; }
+.not .dos-list li::before { content: '✕'; color: var(--red); font-weight: 700; flex-shrink: 0; }
+
+.faq { display: flex; flex-direction: column; }
+.faq-item { border-bottom: 1px solid #EBEBEB; }
+.faq-item:first-child { border-top: 1px solid #EBEBEB; }
+.faq-q { display: flex; justify-content: space-between; align-items: center; padding: 15px 4px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--black); gap: 16px; user-select: none; transition: color .15s; }
+.faq-q:hover { color: var(--red); }
+.faq-arr { font-size: 20px; color: var(--gray-30); transition: transform .2s, color .15s; flex-shrink: 0; line-height: 1; }
+.faq-item.open .faq-arr { transform: rotate(45deg); color: var(--red); }
+.faq-a { display: none; padding: 0 4px 15px; font-size: 13.5px; color: var(--gray-70); line-height: 1.65; }
+.faq-item.open .faq-a { display: block; }
+
+footer { background: var(--gray-10); border-top: 1px solid var(--gray-15); padding: 34px 40px; text-align: center; }
+footer p { font-size: 13px; color: var(--gray-50); }
+footer strong { color: var(--red); }
+
+@media (max-width: 900px) {
+  .wi-grid, .track-grid, .dos, .uc-grid { grid-template-columns: 1fr; }
+  .org-tips { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 700px) {
+  nav { padding: 0 14px; }
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+  .wrap { padding: 48px 18px; }
+  .hero { padding: 56px 18px 48px; }
+  .hunt-bg { padding: 48px 18px; }
+  footer { padding: 26px 18px; }
+  .paths { grid-template-columns: 1fr; }
+  .org-tips { grid-template-columns: 1fr; }
+  .org-row { flex-direction: column; align-items: flex-start; }
+  .org-row .copy-btn { align-self: flex-end; }
+  .tab-btn { font-size: 11.5px; padding: 8px 9px; }
+}
+</style>
+</head>
+<body>
+
+<nav id="top">
+  <a class="nav-logo" href="#top">
+    <span class="nav-dot">E</span>
+    Claude-specting
+  </a>
+  <ul class="nav-links">
+    <li><a href="#what-is">What it is</a></li>
+    <li><a href="#start">Quick Start</a></li>
+    <li><a href="#use-cases">Use Cases</a></li>
+    <li><a href="#org-charts">Org Charts</a></li>
+    <li><a href="#track">Fast / Value</a></li>
+    <li><a href="#ways">7 This Week</a></li>
+    <li><a href="#hunt">Hunt</a></li>
+    <li><a href="#library">Prompts</a></li>
+    <li><a href="#dos">Do / Not This</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#hunt" class="nav-cta">Try the Hunt</a></li>
+  </ul>
+  <button class="hamburger" id="ham" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mob">
+  <a href="#what-is">What it is</a>
+  <a href="#start">Quick Start</a>
+  <a href="#use-cases">Use Cases</a>
+  <a href="#org-charts">Org Charts</a>
+  <a href="#track">Fast / Value Track</a>
+  <a href="#ways">7 This Week</a>
+  <a href="#hunt">Scavenger Hunt</a>
+  <a href="#library">Prompt Library</a>
+  <a href="#dos">Do / Not This</a>
+  <a href="#faq">FAQ</a>
+  <a href="#hunt" class="mob-cta">Try the Hunt</a>
+</div>
+
+<div class="hero" id="hero">
+  <div class="hero-badge">🔴 Envoy AI Day Launch</div>
+  <h1>Meet <em>Claude-specting</em>.<br>Your prospecting copilot.</h1>
+  <p class="hero-sub">Research sharper. Map faster. Sequence smarter. Claude-specting helps Envoy reps build more qualified pipeline from the first outreach to the first meeting.</p>
+  <div class="hero-btns">
+    <a href="#start" class="btn-p">Start here</a>
+    <a href="#hunt" class="btn-g">Try the scavenger hunt</a>
+  </div>
+</div>
+
+<section class="wrap" id="what-is">
+  <div class="wi-grid">
+    <div class="wi-left">
+      <div class="slabel">What it is</div>
+      <h2>Your account intelligence, built in seconds.</h2>
+      <p>Claude-specting is Envoy's dedicated prospecting assistant. It does not give you generic output. It pulls from Envoy product and persona knowledge, your internal account context, and live web research to give you something you can actually use.</p>
+      <p>Think of it as the prep work you never have time to do, done before you write your first email.</p>
+      <div class="cap-tags">
+        <span class="cap-tag">Account research</span>
+        <span class="cap-tag">Stakeholder mapping</span>
+        <span class="cap-tag">Outbound planning</span>
+        <span class="cap-tag">Multi-threading</span>
+        <span class="cap-tag">Sequence creation</span>
+        <span class="cap-tag">Discovery prep</span>
+        <span class="cap-tag">Meeting prep</span>
+        <span class="cap-tag">Pre-RFP positioning</span>
+        <span class="cap-tag">Account strategy</span>
+        <span class="cap-tag">Fast Track vs Value Track</span>
+      </div>
+    </div>
+    <div class="wi-right">
+      <div class="src-block">
+        <div class="src-lbl">Internal knowledge</div>
+        <div class="src-item">Persona playbooks across Security, IT, and Workplace</div>
+        <div class="src-item">Discovery patterns and strong call examples</div>
+        <div class="src-item">Use case priorities and messaging frameworks</div>
+        <div class="src-item">RFP patterns and pre-RFP positioning guidance</div>
+      </div>
+      <div class="src-block">
+        <div class="src-lbl">Internal connectors (when available)</div>
+        <div class="src-item">Gmail and Google Drive for prior account history</div>
+        <div class="src-item">ZoomInfo for title validation and org structure</div>
+        <div class="src-item">Outreach for prior sequencing and account activity</div>
+        <div class="src-item">Google Calendar for prior meetings and recency</div>
+      </div>
+      <div class="src-block">
+        <div class="src-lbl">Live web research</div>
+        <div class="src-item">Trigger events, RTO signals, and expansion news</div>
+        <div class="src-item">Envoy customer stories and case studies</div>
+        <div class="src-item">Compliance, regulatory, and hiring signals</div>
+        <div class="src-item">Public resources from Envoy's website</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="wrap" id="start">
+  <div class="sh">
+    <div class="slabel">Quick start</div>
+    <div class="stitle">Pick where you are. Start there.</div>
+    <div class="ssub">Three paths based on what you need right now. Each one has a prompt you can copy and run immediately.</div>
+  </div>
+  <div class="paths">
+    <div class="path-card">
+      <div class="path-icon">📋</div>
+      <h3>I just got a new account</h3>
+      <div class="path-ask">Build me an account plan for [company]. I have no prior history with them. What is the best entry angle, who should I target first, and what should I send?</div>
+      <div class="path-gives">You get: account strategy, persona prioritization, stakeholder map, first-message recommendation, and Fast Track vs Value Track classification.</div>
+      <div class="path-why">Turns a blank account into a plan in under 2 minutes.</div>
+      <button class="copy-btn" data-copy="Build me an account plan for [company]. I have no prior history with them. What is the best entry angle, who should I target first, and what should I send?">Copy prompt</button>
+    </div>
+    <div class="path-card">
+      <div class="path-icon">✉️</div>
+      <h3>I need messaging fast</h3>
+      <div class="path-ask">Write me a full cold outreach sequence for [name] at [company]. They are [title]. Lead with vendor access governance and audit readiness.</div>
+      <div class="path-gives">You get: full multi-touch sequence including email, LinkedIn, call opener, pivot lines, voicemail, and positive reply follow-up.</div>
+      <div class="path-why">Ready to paste into Outreach before your next block.</div>
+      <button class="copy-btn" data-copy="Write me a full cold outreach sequence for [name] at [company]. They are [title]. Lead with vendor access governance and audit readiness.">Copy prompt</button>
+    </div>
+    <div class="path-card">
+      <div class="path-icon">🎯</div>
+      <h3>I have a meeting coming up</h3>
+      <div class="path-ask">Prep me for a discovery call with [name], [title] at [company]. What should my agenda be, what are the best discovery questions, and what objections should I expect?</div>
+      <div class="path-gives">You get: meeting objective, agenda, strong discovery questions, what good answers look like, hard questions to prepare for, and a follow-up recap email.</div>
+      <div class="path-why">Shows up prepared, not just present.</div>
+      <button class="copy-btn" data-copy="Prep me for a discovery call with [name], [title] at [company]. What should my agenda be, what are the best discovery questions, and what objections should I expect?">Copy prompt</button>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="wrap" id="use-cases">
+  <div class="sh">
+    <div class="slabel">Best use cases</div>
+    <div class="stitle">Know what to ask. Know what you get.</div>
+    <div class="ssub">Click a category to see the details and copy the prompt.</div>
+  </div>
+  <div class="tab-nav" id="tabNav">
+    <button class="tab-btn active" data-tab="plan">Plan an account</button>
+    <button class="tab-btn" data-tab="org">Build an org chart</button>
+    <button class="tab-btn" data-tab="target">Find the right people</button>
+    <button class="tab-btn" data-tab="sequence">Write a sequence</button>
+    <button class="tab-btn" data-tab="discovery">Prep for discovery</button>
+    <button class="tab-btn" data-tab="meeting">Prep for a meeting</button>
+    <button class="tab-btn" data-tab="rfp">Shape before RFP</button>
+    <button class="tab-btn" data-tab="noreply">No reply strategy</button>
+  </div>
+
+  <div id="tab-plan" class="tab-panel active">
+    <div class="uc-grid">
+      <div class="uc-left">
+        <h3>Plan a net-new account from scratch</h3>
+        <p>Claude-specting pulls your account into focus fast. It looks at the company footprint, hiring signals, RTO posture, and known trigger events, then maps the right personas, recommends an entry angle, and tells you what to send first.</p>
+        <div class="uc-plabel">Prompt to run</div>
+        <div class="uc-prompt">
+          <button class="copy-btn-inline" data-copy="Build me a full account plan for [company]. This is a cold account with no prior Envoy history. Give me the account context, the best entry angle, the top stakeholders to target, why now, and what to send first.">Copy</button>
+          Build me a full account plan for [company]. This is a cold account with no prior Envoy history. Give me the account context, the best entry angle, the top stakeholders to target, why now, and what to send first.
+        </div>
+      </div>
+      <div class="uc-right">
+        <div class="uc-olabel">What you get back</div>
+        <div class="uc-item">Account context and trigger events worth knowing</div>
+        <div class="uc-item">Best entry angle with reasoning</div>
+        <div class="uc-item">Top 3 to 5 stakeholders ranked by priority</div>
+        <div class="uc-item">Fast Track or Value Track classification</div>
+        <div class="uc-item">First-message recommendation</div>
+        <div class="uc-item">Pre-RFP signals to watch for</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-org" class="tab-panel">
+    <div class="uc-grid">
+      <div class="uc-left">
+        <h3>Build an org chart and stakeholder map</h3>
+        <p>Stop guessing who to target. Claude-specting maps the relevant personas across Security, IT, and Workplace, groups them by function, identifies the best cold entry point, and labels who to multi-thread with and who to pull in later.</p>
+        <div class="uc-plabel">Prompt to run</div>
+        <div class="uc-prompt">
+          <button class="copy-btn-inline" data-copy="Build me a stakeholder map for [company]. Include Security, IT, and Workplace personas. Label the best cold entry point, who to multi-thread with, and who to hold for later. Explain why each person matters.">Copy</button>
+          Build me a stakeholder map for [company]. Include Security, IT, and Workplace personas. Label the best cold entry point, who to multi-thread with, and who to hold for later. Explain why each person matters.
+        </div>
+      </div>
+      <div class="uc-right">
+        <div class="uc-olabel">What you get back</div>
+        <div class="uc-item">Stakeholders grouped by Security, IT, and Workplace</div>
+        <div class="uc-item">Clear "Start here" label with rationale</div>
+        <div class="uc-item">Multi-thread and hold-for-later labels</div>
+        <div class="uc-item">Care-abouts listed for each persona</div>
+        <div class="uc-item">Sequencing guidance for each person</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-target" class="tab-panel">
+    <div class="uc-grid">
+      <div class="uc-left">
+        <h3>Find the right people to contact first</h3>
+        <p>Not every title is the right starting point. Claude-specting helps you distinguish between who looks important on paper and who is actually the best cold entry. Manager-level contacts often win here. It will tell you why.</p>
+        <div class="uc-plabel">Prompt to run</div>
+        <div class="uc-prompt">
+          <button class="copy-btn-inline" data-copy="Who should I target first at [company] if I want the fastest path to a first meeting? Show me the manager layer under the senior contacts and explain who owns the problem Envoy solves.">Copy</button>
+          Who should I target first at [company] if I want the fastest path to a first meeting? Show me the manager layer under the senior contacts and explain who owns the problem Envoy solves.
+        </div>
+      </div>
+      <div class="uc-right">
+        <div class="uc-olabel">What you get back</div>
+        <div class="uc-item">Best cold entry point with confidence level</div>
+        <div class="uc-item">Manager-layer contacts under senior stakeholders</div>
+        <div class="uc-item">Who owns the problem vs who approves the budget</div>
+        <div class="uc-item">Prioritized prospect list with reasoning</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-sequence" class="tab-panel">
+    <div class="uc-grid">
+      <div class="uc-left">
+        <h3>Write a full outbound sequence</h3>
+        <p>Every touch should add something. Claude-specting writes sequences that build across multiple contacts with distinct angles, stronger proof, and persona-specific language. Not the same idea repeated five times.</p>
+        <div class="uc-plabel">Prompt to run</div>
+        <div class="uc-prompt">
+          <button class="copy-btn-inline" data-copy="Write a full cold outreach sequence for [name], [title] at [company]. Use vendor access governance as the primary angle. Include email, LinkedIn, call opener, pivot lines, voicemail, and a positive reply follow-up.">Copy</button>
+          Write a full cold outreach sequence for [name], [title] at [company]. Use vendor access governance as the primary angle. Include email, LinkedIn, call opener, pivot lines, voicemail, and a positive reply follow-up.
+        </div>
+      </div>
+      <div class="uc-right">
+        <div class="uc-olabel">What you get back</div>
+        <div class="uc-item">Touch 1: cold email under 120 words</div>
+        <div class="uc-item">Touch 2: LinkedIn connect note</div>
+        <div class="uc-item">Touch 3: LinkedIn follow-up</div>
+        <div class="uc-item">Touch 4: second email with a new angle</div>
+        <div class="uc-item">Touch 5: call opener and pivot lines</div>
+        <div class="uc-item">Voicemail and positive reply follow-up</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-discovery" class="tab-panel">
+    <div class="uc-grid">
+      <div class="uc-left">
+        <h3>Prep for a discovery call</h3>
+        <p>Discovery shapes the deal. Claude-specting builds questions that uncover current workflow gaps, manual exception handling, stakeholder ownership, compliance exposure, and where inconsistency across sites lives. These are not generic questions.</p>
+        <div class="uc-plabel">Prompt to run</div>
+        <div class="uc-prompt">
+          <button class="copy-btn-inline" data-copy="Give me strong discovery questions for a call with [title] at [company]. Focus on uncovering vendor access workflows, audit readiness gaps, and where manual processes create risk or inconsistency across sites.">Copy</button>
+          Give me strong discovery questions for a call with [title] at [company]. Focus on uncovering vendor access workflows, audit readiness gaps, and where manual processes create risk or inconsistency across sites.
+        </div>
+      </div>
+      <div class="uc-right">
+        <div class="uc-olabel">What you get back</div>
+        <div class="uc-item">Current workflow and exception-handling questions</div>
+        <div class="uc-item">Stakeholder ownership and org structure questions</div>
+        <div class="uc-item">Security and compliance exposure questions</div>
+        <div class="uc-item">Integration and system dependency questions</div>
+        <div class="uc-item">What good answers look like for each question</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-meeting" class="tab-panel">
+    <div class="uc-grid">
+      <div class="uc-left">
+        <h3>Prep for a meeting end-to-end</h3>
+        <p>Walk in with a plan. Claude-specting builds your full meeting prep: objective, agenda, the best questions to ask, what strong answers look like, hard questions to prepare for, and the follow-up recap email to send right after.</p>
+        <div class="uc-plabel">Prompt to run</div>
+        <div class="uc-prompt">
+          <button class="copy-btn-inline" data-copy="Prep me for a discovery meeting with [name], [title] at [company]. What is my objective, what should my agenda look like, what are the 5 best questions to ask, and what objections should I prepare for?">Copy</button>
+          Prep me for a discovery meeting with [name], [title] at [company]. What is my objective, what should my agenda look like, what are the 5 best questions to ask, and what objections should I prepare for?
+        </div>
+      </div>
+      <div class="uc-right">
+        <div class="uc-olabel">What you get back</div>
+        <div class="uc-item">Meeting objective and desired outcome</div>
+        <div class="uc-item">Suggested agenda with timing</div>
+        <div class="uc-item">Top 5 discovery questions with context</div>
+        <div class="uc-item">What strong answers sound like</div>
+        <div class="uc-item">Hard questions and how to handle them</div>
+        <div class="uc-item">Follow-up recap email ready to send</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-rfp" class="tab-panel">
+    <div class="uc-grid">
+      <div class="uc-left">
+        <h3>Shape the deal before an RFP lands</h3>
+        <p>The best time to influence requirements is before they are written. Claude-specting helps you identify early evaluation signals, who to involve, what to send now, and what questions shape the buying criteria in Envoy's favor.</p>
+        <div class="uc-plabel">Prompt to run</div>
+        <div class="uc-prompt">
+          <button class="copy-btn-inline" data-copy="Help me shape the deal at [company] before an RFP. What signals suggest an evaluation may be coming? Who should I involve earlier? What should I send now and what questions would help me influence their buying criteria?">Copy</button>
+          Help me shape the deal at [company] before an RFP. What signals suggest an evaluation may be coming? Who should I involve earlier? What should I send now and what questions would help me influence their buying criteria?
+        </div>
+      </div>
+      <div class="uc-right">
+        <div class="uc-olabel">What you get back</div>
+        <div class="uc-item">Early evaluation signals to watch</div>
+        <div class="uc-item">Who to involve earlier and why</div>
+        <div class="uc-item">What to send now to shape requirements</div>
+        <div class="uc-item">Questions that influence buying criteria</div>
+        <div class="uc-item">Pre-RFP positioning recommendations</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-noreply" class="tab-panel">
+    <div class="uc-grid">
+      <div class="uc-left">
+        <h3>Find a new angle after no reply</h3>
+        <p>Going back to a stalled prospect takes a new idea, not a "just checking in." Claude-specting finds a different angle based on a new trigger event, a different stakeholder, or a sharper use case hook that gives you a real reason to re-engage.</p>
+        <div class="uc-plabel">Prompt to run</div>
+        <div class="uc-prompt">
+          <button class="copy-btn-inline" data-copy="I have not gotten a reply from [name] at [company] after [number] touches. Give me a re-engagement strategy with a new angle, a different stakeholder to try, and a short re-engagement email I can send now.">Copy</button>
+          I have not gotten a reply from [name] at [company] after [number] touches. Give me a re-engagement strategy with a new angle, a different stakeholder to try, and a short re-engagement email I can send now.
+        </div>
+      </div>
+      <div class="uc-right">
+        <div class="uc-olabel">What you get back</div>
+        <div class="uc-item">New angle based on a different use case or trigger</div>
+        <div class="uc-item">Alternate stakeholder recommendation</div>
+        <div class="uc-item">Short re-engagement email ready to send</div>
+        <div class="uc-item">Guidance on when to pause vs keep going</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="wrap" id="org-charts">
+  <div class="sh">
+    <div class="slabel">Org charts and prospect lists</div>
+    <div class="stitle">Research to action. Fast.</div>
+    <div class="ssub">Claude-specting builds stakeholder maps, org charts, and ranked prospect lists. Here is how to use them well.</div>
+  </div>
+  <div class="org-tips">
+    <div class="org-tip">
+      <div class="org-tip-n">01</div>
+      <h4>Start with one thread</h4>
+      <p>Pick the best entry point from the map. Do not blast the whole org. One strong opener beats five weak ones.</p>
+    </div>
+    <div class="org-tip">
+      <div class="org-tip-n">02</div>
+      <h4>Run 2 to 3 parallel threads max</h4>
+      <p>After your first touch is out, pick one or two parallel stakeholders. Different persona, different angle.</p>
+    </div>
+    <div class="org-tip">
+      <div class="org-tip-n">03</div>
+      <h4>Go manager-layer when needed</h4>
+      <p>If senior leaders are hard to reach, map the layer underneath. Execution-level contacts own the problem and respond more often.</p>
+    </div>
+  </div>
+  <div class="org-rows">
+    <div class="org-row">
+      <span class="org-row-text">I'm prospecting into [account]. Build me a full org chart across Security, Workplace, and IT, with an outbound plan for the top 3 people.</span>
+      <button class="copy-btn" data-copy="I'm prospecting into [account]. Build me a full org chart across Security, Workplace, and IT, with an outbound plan for the top 3 people.">Copy</button>
+    </div>
+    <div class="org-row">
+      <span class="org-row-text">These contacts are too senior to cold reach. Show me the manager layer under [name] and [name] at [company].</span>
+      <button class="copy-btn" data-copy="These contacts are too senior to cold reach. Show me the manager layer under [name] and [name] at [company].">Copy</button>
+    </div>
+    <div class="org-row">
+      <span class="org-row-text">Turn this stakeholder map into a prioritized prospect list ranked by best fit for a vendor access governance conversation.</span>
+      <button class="copy-btn" data-copy="Turn this stakeholder map into a prioritized prospect list ranked by best fit for a vendor access governance conversation.">Copy</button>
+    </div>
+    <div class="org-row">
+      <span class="org-row-text">Build a sequence for the top 3 people in this chart. Each sequence should have a different angle based on their persona.</span>
+      <button class="copy-btn" data-copy="Build a sequence for the top 3 people in this chart. Each sequence should have a different angle based on their persona.">Copy</button>
+    </div>
+    <div class="org-row">
+      <span class="org-row-text">Who should I start with if I want the fastest path into [account] and why?</span>
+      <button class="copy-btn" data-copy="Who should I start with if I want the fastest path into [account] and why?">Copy</button>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="wrap" id="track">
+  <div class="sh">
+    <div class="slabel">Fast Track vs Value Track</div>
+    <div class="stitle">Start with a hypothesis. Confirm in discovery.</div>
+    <div class="ssub">This is not a formula based on company size or site count. It is a working read you refine as you learn more. Use it to set your initial pacing, then adjust based on what discovery reveals.</div>
+  </div>
+  <div class="track-grid">
+    <div class="track-card fast">
+      <span class="track-badge">Fast Track</span>
+      <h3>Clear signal. Move now.</h3>
+      <p class="track-intro">Your initial read suggests a shorter path. Test it early and move fast if discovery confirms it.</p>
+      <ul class="track-sigs">
+        <li>Clear trigger event visible from the outside (RTO mandate, new office, recent incident)</li>
+        <li>One or two personas likely own the problem without heavy committee involvement</li>
+        <li>Simpler entry point with a clean use case match</li>
+        <li>Discovery quickly surfaces urgency and ownership</li>
+        <li>Higher odds of near-term meeting and a short sales cycle</li>
+      </ul>
+      <div class="track-note"><strong>Adjust if:</strong> discovery reveals more stakeholders, a committee forming, or compliance requirements you did not expect. That shifts the motion toward Value Track.</div>
+      <div class="track-prompt-box">Classify [company] as Fast Track or Value Track based on what we know. What signals support that read and how should it shape my initial outreach?</div>
+    </div>
+    <div class="track-card value">
+      <span class="track-badge">Value Track</span>
+      <h3>Bigger upside. Play the long game.</h3>
+      <p class="track-intro">Your initial read suggests a more complex motion. That is fine. It means more deal-shaping opportunity, not less.</p>
+      <ul class="track-sigs">
+        <li>Multi-site or complex global footprint with inconsistent workflows</li>
+        <li>Security, compliance, or regulatory sensitivity that raises the stakes</li>
+        <li>Multiple stakeholders with different priorities across functions</li>
+        <li>Transformation or standardization initiative already underway</li>
+        <li>Higher upside but requires earlier multi-threading and deal shaping</li>
+      </ul>
+      <div class="track-note"><strong>Adjust if:</strong> a single champion emerges quickly who can move fast and owns budget. That can open a faster lane even inside a complex account.</div>
+      <div class="track-prompt-box">This looks like a Value Track account. What is the right sequencing strategy, who do I need to involve, and what should I be doing now to shape the deal?</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="wrap" id="ways">
+  <div class="sh">
+    <div class="slabel">Get started fast</div>
+    <div class="stitle">7 ways to use Claude-specting this week.</div>
+    <div class="ssub">Pick one. Run it before your next call or block. Each takes less than 5 minutes to try.</div>
+  </div>
+  <div class="ways">
+    <div class="way-card">
+      <div class="way-num">01</div>
+      <h4>Build an account plan for a new target</h4>
+      <p>Turn a blank account into a prioritized plan before you write a single email.</p>
+      <div class="way-prompt">Build me a full account plan for [company]. Cold account, no prior Envoy history. Give me the entry angle, top stakeholders, and what to send first.</div>
+    </div>
+    <div class="way-card">
+      <div class="way-num">02</div>
+      <h4>Create a top-5 prospect universe</h4>
+      <p>Get a ranked view of who matters most across Security, IT, and Workplace, with reasoning for each.</p>
+      <div class="way-prompt">Who are the top 5 contacts I should prioritize at [company] right now and why? Rank them by best fit for a vendor access governance conversation.</div>
+    </div>
+    <div class="way-card">
+      <div class="way-num">03</div>
+      <h4>Write a sequence by persona</h4>
+      <p>Build a full multi-touch sequence for your top contact. Not a generic template with a name swapped in.</p>
+      <div class="way-prompt">Write a full cold outreach sequence for [name], [title] at [company]. Lead with vendor access governance. Include all touches through voicemail and positive reply follow-up.</div>
+    </div>
+    <div class="way-card">
+      <div class="way-num">04</div>
+      <h4>Prep for a first meeting</h4>
+      <p>Walk into your next discovery call with a plan. Objective, agenda, questions, objection prep, and a follow-up email.</p>
+      <div class="way-prompt">Prep me for a discovery call with [name], [title] at [company]. Give me an objective, agenda, top 5 questions, and a follow-up recap email.</div>
+    </div>
+    <div class="way-card">
+      <div class="way-num">05</div>
+      <h4>Find a better angle after no reply</h4>
+      <p>Get a real reason to re-engage with a new hook, a different stakeholder, or a stronger use case tie-in.</p>
+      <div class="way-prompt">I sent [number] touches to [name] at [company] with no reply. Give me a new angle, a different stakeholder to try, and a short re-engagement email.</div>
+    </div>
+    <div class="way-card">
+      <div class="way-num">06</div>
+      <h4>Identify who to involve before an RFP</h4>
+      <p>Get ahead of formal evaluations. Find out who to be talking to earlier and what to send to shape requirements.</p>
+      <div class="way-prompt">What signals at [company] suggest an evaluation may be coming? Who should I get in front of earlier and what should I send them now?</div>
+    </div>
+    <div class="way-card">
+      <div class="way-num">07</div>
+      <h4>Expand from one thread to multiple</h4>
+      <p>You have one conversation going. Build a plan to run parallel threads without stepping on yourself.</p>
+      <div class="way-prompt">I have been talking to [name, title] at [company]. Who else should I be running parallel threads with and what angle should I use for each person?</div>
+    </div>
+  </div>
+</section>
+
+<div class="hunt-bg" id="hunt">
+  <div class="hunt-in">
+    <div class="hunt-hdr">
+      <div class="hunt-badge">AI Day Challenge</div>
+      <h2>Claude-specting Scavenger Hunt</h2>
+      <p>Learn by doing. Run real prompts on real accounts. Complete all 3 levels.</p>
+    </div>
+    <div class="hunt-prog">
+      <span class="prog-lbl">Progress</span>
+      <div class="prog-wrap"><div class="prog-bar" id="progBar"></div></div>
+      <span class="prog-count" id="progCount">0 / 9 complete</span>
+    </div>
+    <div class="hunt-levels">
+      <div class="lv1">
+        <div class="hlvl-hdr"><span class="lvl-badge">Level 1</span><h3>Get comfortable</h3></div>
+        <div class="hunt-cards">
+          <div class="hcard" data-hid="h1">
+            <div class="hcard-top"><h4>Get an account plan</h4><div class="hcheck" data-hcheck="h1"></div></div>
+            <div class="hprompt">Build me an account plan for [one of your target accounts]. Cold account, no prior history. Give me context, best entry angle, top people to target, and what to send first.<button class="hcopy" data-copy="Build me an account plan for [one of your target accounts]. Cold account, no prior history. Give me context, best entry angle, top people to target, and what to send first.">Copy</button></div>
+            <div class="hsucc"><strong>Success looks like:</strong> a usable account strategy, not a research summary.</div>
+            <div class="hwhy">Turns a blank account into a plan you can act on immediately.</div>
+          </div>
+          <div class="hcard" data-hid="h2">
+            <div class="hcard-top"><h4>Classify the motion</h4><div class="hcheck" data-hcheck="h2"></div></div>
+            <div class="hprompt">Is [company] more likely a Fast Track or Value Track opportunity based on what we know? What signals support that read?<button class="hcopy" data-copy="Is [company] more likely a Fast Track or Value Track opportunity based on what we know? What signals support that read?">Copy</button></div>
+            <div class="hsucc"><strong>Success looks like:</strong> a clear hypothesis with specific reasoning, not a coin flip.</div>
+            <div class="hwhy">Changes how you sequence, how patient you are, and who you involve early.</div>
+          </div>
+          <div class="hcard" data-hid="h3">
+            <div class="hcard-top"><h4>Get your first 3 targets</h4><div class="hcheck" data-hcheck="h3"></div></div>
+            <div class="hprompt">Who are the first 3 people I should target at [company] and what should I send each of them first?<button class="hcopy" data-copy="Who are the first 3 people I should target at [company] and what should I send each of them first?">Copy</button></div>
+            <div class="hsucc"><strong>Success looks like:</strong> three distinct contacts with different angles.</div>
+            <div class="hwhy">Gets you out of analysis paralysis and into action.</div>
+          </div>
+        </div>
+      </div>
+      <div class="lv2">
+        <div class="hlvl-hdr"><span class="lvl-badge">Level 2</span><h3>Build pipeline</h3></div>
+        <div class="hunt-cards">
+          <div class="hcard" data-hid="h4">
+            <div class="hcard-top"><h4>Generate a real org chart</h4><div class="hcheck" data-hcheck="h4"></div></div>
+            <div class="hprompt">Build me a stakeholder map for [company] across Security, IT, and Workplace. Label the best entry point, who to multi-thread, and who to hold for later.<button class="hcopy" data-copy="Build me a stakeholder map for [company] across Security, IT, and Workplace. Label the best entry point, who to multi-thread, and who to hold for later.">Copy</button></div>
+            <div class="hsucc"><strong>Success looks like:</strong> a map you could hand to your manager and explain in 30 seconds.</div>
+            <div class="hwhy">Replaces guesswork with a prioritized plan.</div>
+          </div>
+          <div class="hcard" data-hid="h5">
+            <div class="hcard-top"><h4>Get the manager layer</h4><div class="hcheck" data-hcheck="h5"></div></div>
+            <div class="hprompt">The senior contacts at [company] are hard to reach. Show me the manager layer under [VP or Director name] who might own the problem day-to-day.<button class="hcopy" data-copy="The senior contacts at [company] are hard to reach. Show me the manager layer under [VP or Director name] who might own the problem day-to-day.">Copy</button></div>
+            <div class="hsucc"><strong>Success looks like:</strong> at least 2 to 3 manager-level contacts you did not have before.</div>
+            <div class="hwhy">Execution-level contacts own the problem and respond more often.</div>
+          </div>
+          <div class="hcard" data-hid="h6">
+            <div class="hcard-top"><h4>Build a full sequence</h4><div class="hcheck" data-hcheck="h6"></div></div>
+            <div class="hprompt">Write me a full cold outreach sequence for [name], [title] at [company]. Lead with vendor access governance. Include email, LinkedIn, call opener, pivot lines, and a positive reply follow-up.<button class="hcopy" data-copy="Write me a full cold outreach sequence for [name], [title] at [company]. Lead with vendor access governance. Include email, LinkedIn, call opener, pivot lines, and a positive reply follow-up.">Copy</button></div>
+            <div class="hsucc"><strong>Success looks like:</strong> something you can paste into Outreach without major edits.</div>
+            <div class="hwhy">A good sequence does in 5 touches what a bad one cannot do in 15.</div>
+          </div>
+        </div>
+      </div>
+      <div class="lv3">
+        <div class="hlvl-hdr"><span class="lvl-badge">Level 3</span><h3>Deal shaping</h3></div>
+        <div class="hunt-cards">
+          <div class="hcard" data-hid="h7">
+            <div class="hcard-top"><h4>Find the evaluation signals</h4><div class="hcheck" data-hcheck="h7"></div></div>
+            <div class="hprompt">What signals at [company] suggest a formal evaluation or RFP may be coming? What should I be watching for and who should I get in front of first?<button class="hcopy" data-copy="What signals at [company] suggest a formal evaluation or RFP may be coming? What should I be watching for and who should I get in front of first?">Copy</button></div>
+            <div class="hsucc"><strong>Success looks like:</strong> 3 or more specific signals tied to what is actually happening at this account.</div>
+            <div class="hwhy">The best deals are shaped before the RFP is written.</div>
+          </div>
+          <div class="hcard" data-hid="h8">
+            <div class="hcard-top"><h4>Influence buying criteria early</h4><div class="hcheck" data-hcheck="h8"></div></div>
+            <div class="hprompt">What discovery questions should I be asking at [company] right now to help shape their buying criteria in Envoy's favor before they write requirements?<button class="hcopy" data-copy="What discovery questions should I be asking at [company] right now to help shape their buying criteria in Envoy's favor before they write requirements?">Copy</button></div>
+            <div class="hsucc"><strong>Success looks like:</strong> questions you can run in your next call that shift the conversation toward what Envoy does best.</div>
+            <div class="hwhy">Criteria set early stick. Getting in first changes the whole evaluation.</div>
+          </div>
+          <div class="hcard" data-hid="h9">
+            <div class="hcard-top"><h4>Prep a full meeting plan</h4><div class="hcheck" data-hcheck="h9"></div></div>
+            <div class="hprompt">Prep me for a discovery call with [name], [title] at [company]. I want an objective, agenda, top 5 questions, what good answers look like, hard objections to prepare for, and a follow-up email to send right after.<button class="hcopy" data-copy="Prep me for a discovery call with [name], [title] at [company]. I want an objective, agenda, top 5 questions, what good answers look like, hard objections to prepare for, and a follow-up email to send right after.">Copy</button></div>
+            <div class="hsucc"><strong>Success looks like:</strong> a meeting prep plan you would actually bring to the call.</div>
+            <div class="hwhy">The rep who walks in with a plan controls the room.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="wrap" id="library">
+  <div class="sh">
+    <div class="slabel">Prompt library</div>
+    <div class="stitle">15 prompts. Copy and run.</div>
+    <div class="ssub">Ready to paste into Claude-specting right now. Replace the brackets and go.</div>
+  </div>
+  <div class="plib">
+    <div class="pcard"><div class="pcat">Account Planning</div><div class="ptitle">Full account plan</div><div class="ptext">Build me a full account plan for [company]. Cold account. No prior Envoy history. Give me account context, the best entry angle, top stakeholders, why now, and what to send first.</div><button class="copy-btn" data-copy="Build me a full account plan for [company]. Cold account. No prior Envoy history. Give me account context, the best entry angle, top stakeholders, why now, and what to send first.">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Account Planning</div><div class="ptitle">Fast Track or Value Track hypothesis</div><div class="ptext">What is my initial read on [company] as Fast Track or Value Track? What signals support that hypothesis and how should it shape my sequencing and first outreach?</div><button class="copy-btn" data-copy="What is my initial read on [company] as Fast Track or Value Track? What signals support that hypothesis and how should it shape my sequencing and first outreach?">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Org Chart</div><div class="ptitle">Full stakeholder map</div><div class="ptext">Build me a stakeholder map for [company] across Security, IT, and Workplace. Label the best cold entry point, who to multi-thread, and who to hold for later. Explain why each person matters.</div><button class="copy-btn" data-copy="Build me a stakeholder map for [company] across Security, IT, and Workplace. Label the best cold entry point, who to multi-thread, and who to hold for later. Explain why each person matters.">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Org Chart</div><div class="ptitle">Manager layer mapping</div><div class="ptext">The senior contacts at [company] are hard to cold reach. Show me the manager layer under [name] who likely owns the vendor access or workplace operations problem day-to-day.</div><button class="copy-btn" data-copy="The senior contacts at [company] are hard to cold reach. Show me the manager layer under [name] who likely owns the vendor access or workplace operations problem day-to-day.">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Targeting</div><div class="ptitle">Best entry point</div><div class="ptext">Who should I target first at [company] if I want the fastest path to a first meeting? Rank the top 3 contacts by best fit and explain which persona owns the problem.</div><button class="copy-btn" data-copy="Who should I target first at [company] if I want the fastest path to a first meeting? Rank the top 3 contacts by best fit and explain which persona owns the problem.">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Targeting</div><div class="ptitle">Backup persona</div><div class="ptext">My primary contact at [company] has gone cold. Give me a backup persona and a new angle I have not used yet. Who else should I be talking to and why?</div><button class="copy-btn" data-copy="My primary contact at [company] has gone cold. Give me a backup persona and a new angle I have not used yet. Who else should I be talking to and why?">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Sequencing</div><div class="ptitle">Full cold sequence</div><div class="ptext">Write a full cold outreach sequence for [name], [title] at [company]. Lead with vendor access governance. Include email, LinkedIn connect, LinkedIn follow-up, second email, call opener, pivot lines, voicemail, and positive reply follow-up.</div><button class="copy-btn" data-copy="Write a full cold outreach sequence for [name], [title] at [company]. Lead with vendor access governance. Include email, LinkedIn connect, LinkedIn follow-up, second email, call opener, pivot lines, voicemail, and positive reply follow-up.">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Sequencing</div><div class="ptitle">First email only</div><div class="ptext">Write me one cold email for [name], [title] at [company]. Under 100 words. Lead with vendor access governance or IP protection risk. No fluff, no generic opener.</div><button class="copy-btn" data-copy="Write me one cold email for [name], [title] at [company]. Under 100 words. Lead with vendor access governance or IP protection risk. No fluff, no generic opener.">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Discovery</div><div class="ptitle">Discovery questions</div><div class="ptext">Give me the best discovery questions for a call with [title] at [company]. Focus on vendor access workflows, audit readiness, manual process gaps, and where inconsistency across sites creates risk.</div><button class="copy-btn" data-copy="Give me the best discovery questions for a call with [title] at [company]. Focus on vendor access workflows, audit readiness, manual process gaps, and where inconsistency across sites creates risk.">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Meeting Prep</div><div class="ptitle">Full meeting prep</div><div class="ptext">Prep me for a discovery meeting with [name], [title] at [company]. Give me an objective, agenda, top 5 questions, what strong answers look like, hard objections, and a follow-up recap email to send after.</div><button class="copy-btn" data-copy="Prep me for a discovery meeting with [name], [title] at [company]. Give me an objective, agenda, top 5 questions, what strong answers look like, hard objections, and a follow-up recap email to send after.">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Re-engagement</div><div class="ptitle">Stalled account re-engage</div><div class="ptext">I sent [number] touches to [name] at [company] with no reply. Give me a new angle, a different stakeholder to try, and a short re-engagement email I can send now.</div><button class="copy-btn" data-copy="I sent [number] touches to [name] at [company] with no reply. Give me a new angle, a different stakeholder to try, and a short re-engagement email I can send now.">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Pre-RFP</div><div class="ptitle">Shape before the RFP</div><div class="ptext">Help me shape the deal at [company] before an RFP. What signals suggest one may be coming? Who should I involve earlier? What should I send now and what questions would influence their buying criteria?</div><button class="copy-btn" data-copy="Help me shape the deal at [company] before an RFP. What signals suggest one may be coming? Who should I involve earlier? What should I send now and what questions would influence their buying criteria?">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Multi-threading</div><div class="ptitle">Multi-thread strategy</div><div class="ptext">Build me a multi-threading plan for [company]. I have been talking to [name, title]. Who else should I be running parallel threads with and what angle should I use for each?</div><button class="copy-btn" data-copy="Build me a multi-threading plan for [company]. I have been talking to [name, title]. Who else should I be running parallel threads with and what angle should I use for each?">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Proof</div><div class="ptitle">Customer proof and case study</div><div class="ptext">What Envoy customer stories or proof points are most relevant for a conversation with [title] at a company like [company]? Focus on vendor access governance, audit readiness, or enterprise-scale deployments.</div><button class="copy-btn" data-copy="What Envoy customer stories or proof points are most relevant for a conversation with [title] at a company like [company]? Focus on vendor access governance, audit readiness, or enterprise-scale deployments.">Copy prompt</button></div>
+    <div class="pcard"><div class="pcat">Follow-up</div><div class="ptitle">What to send first</div><div class="ptext">Given what I know about [company], what is the single best thing I can send right now to start a conversation? Who should it go to and what should it say?</div><button class="copy-btn" data-copy="Given what I know about [company], what is the single best thing I can send right now to start a conversation? Who should it go to and what should it say?">Copy prompt</button></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="wrap" id="dos">
+  <div class="sh">
+    <div class="slabel">How to use it well</div>
+    <div class="stitle">Do this. Not this.</div>
+    <div class="ssub">The difference between useful output and generic output is almost always in how you ask.</div>
+  </div>
+  <div class="dos">
+    <div class="dos-card do">
+      <div class="dos-hdr"><div class="dos-icon">✅</div><h3>Do this</h3></div>
+      <ul class="dos-list">
+        <li>Ask for a full account plan with context, not just "who should I target"</li>
+        <li>Include the account name and as much context as you have</li>
+        <li>Ask for stakeholder maps and let them guide your sequencing</li>
+        <li>Ask for persona-specific messaging when you know the title</li>
+        <li>Ask what to send first before you write anything</li>
+        <li>Ask for proof and case studies relevant to the persona</li>
+        <li>Push on the first output. Ask it to sharpen, shorten, or change the angle</li>
+        <li>Use Fast Track or Value Track as an initial hypothesis, then update it after discovery</li>
+        <li>Ask for discovery questions before a real call</li>
+        <li>Use it for meeting prep, not just prospecting</li>
+      </ul>
+    </div>
+    <div class="dos-card not">
+      <div class="dos-hdr"><div class="dos-icon">🚫</div><h3>Not this</h3></div>
+      <ul class="dos-list">
+        <li>Do not ask for a cold email with no account context and expect a good result</li>
+        <li>Do not stop at research without turning it into an action</li>
+        <li>Do not blast every stakeholder at once with the same message</li>
+        <li>Do not assume the most senior title is the best cold entry point</li>
+        <li>Do not paste the output directly without checking it for context and fit</li>
+        <li>Do not skip the org chart step when you are breaking into a new account</li>
+        <li>Do not ask for a sequence if you do not yet know who you are targeting</li>
+        <li>Do not treat Fast Track vs Value Track as a fixed label. Revisit it after discovery</li>
+        <li>Do not ask vague questions and expect sharp output. Be specific</li>
+        <li>Do not use it once and move on. Refine the output before you send</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="wrap" id="faq">
+  <div class="sh">
+    <div class="slabel">FAQ</div>
+    <div class="stitle">Common questions.</div>
+    <div class="ssub">Quick answers so you can get moving.</div>
+  </div>
+  <div class="faq" id="faqList">
+    <div class="faq-item"><div class="faq-q">What should I include in my prompt?<span class="faq-arr">+</span></div><div class="faq-a">At minimum: the company name, the contact name and title if you have them, whether the account is warm or cold, and what you are trying to accomplish. The more context you give, the sharper the output. You do not need to be perfect. Start with what you know.</div></div>
+    <div class="faq-item"><div class="faq-q">What if I do not know who to target yet?<span class="faq-arr">+</span></div><div class="faq-a">Ask for the stakeholder map first. Give Claude-specting the account name and tell it what motion you are running. It will surface the relevant personas, rank them by best fit, and tell you where to start. The org chart is the right first step when you are starting from scratch.</div></div>
+    <div class="faq-item"><div class="faq-q">What if the contacts are too senior to cold reach?<span class="faq-arr">+</span></div><div class="faq-a">Ask for the manager layer. Senior leaders at big companies are hard to reach cold. The managers underneath them own execution, respond more often, and can pull you up when the time is right. Ask Claude-specting to show you the manager layer under a specific VP or Director and it will map that for you.</div></div>
+    <div class="faq-item"><div class="faq-q">What if I already have some account activity?<span class="faq-arr">+</span></div><div class="faq-a">Tell it. The more context you include about prior touches, prior conversations, and what has already been tried, the better the output. Claude-specting will also check Gmail, Google Drive, and Outreach when relevant to surface prior account history so it does not give you a cold plan for a warm account.</div></div>
+    <div class="faq-item"><div class="faq-q">How do I make the output shorter or more punchy?<span class="faq-arr">+</span></div><div class="faq-a">Just ask. Add "make it shorter and more direct" or "cut this to under 80 words" and it will sharpen. You can also say "give me just the email, no explanation" if you do not need the rationale. Pushing on the first output is almost always worth it.</div></div>
+    <div class="faq-item"><div class="faq-q">Should I ask for a sequence or just one email?<span class="faq-arr">+</span></div><div class="faq-a">If you know who you are targeting and you are ready to activate, ask for the full sequence. If you are still figuring out the angle or persona, start with one email and refine from there before building out. The sequence is most useful when you already have a clear point of view on the contact.</div></div>
+    <div class="faq-item"><div class="faq-q">What if it gives me something that feels off?<span class="faq-arr">+</span></div><div class="faq-a">Push back on it. Tell it what feels wrong and ask it to adjust. You might say "the tone is too formal" or "this does not reflect what I know about this account" and it will rewrite. The first output is a starting point, not the final product.</div></div>
+  </div>
+</section>
+
+<footer>
+  <p>Built for <strong>Envoy</strong> sellers. Powered by Claude-specting. <span style="color:#BDBDBD;margin:0 8px">|</span> Go build pipeline.</p>
+</footer>
+
+<script>
+function showCopied(btn, orig) {
+  btn.textContent = 'Copied!';
+  btn.classList.add('copied');
+  setTimeout(function() { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+}
+function doCopy(text, btn) {
+  var orig = btn.textContent;
+  if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    navigator.clipboard.writeText(text).then(
+      function() { showCopied(btn, orig); },
+      function() { execFallback(text, btn, orig); }
+    );
+    return;
+  }
+  execFallback(text, btn, orig);
+}
+function execFallback(text, btn, orig) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:none;padding:0';
+  ta.setAttribute('readonly', '');
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  if (ok) { showCopied(btn, orig); }
+  else { window.prompt('Press Cmd+C / Ctrl+C to copy:', text); }
+}
+document.querySelectorAll('[data-copy]').forEach(function(btn) {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    doCopy(btn.getAttribute('data-copy'), btn);
+  });
+});
+
+var tabNav = document.getElementById('tabNav');
+if (tabNav) {
+  tabNav.addEventListener('click', function(e) {
+    var btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    var id = btn.getAttribute('data-tab');
+    if (!id) return;
+    tabNav.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    btn.classList.add('active');
+    var panel = document.getElementById('tab-' + id);
+    if (panel) panel.classList.add('active');
+  });
+}
+
+document.getElementById('faqList').addEventListener('click', function(e) {
+  var q = e.target.closest('.faq-q');
+  if (!q) return;
+  var item = q.parentElement;
+  var isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
+  if (!isOpen) item.classList.add('open');
+});
+
+var huntState = {};
+function refreshHuntUI() {
+  var done = 0;
+  document.querySelectorAll('.hcard').forEach(function(card) {
+    var id = card.getAttribute('data-hid');
+    var chk = card.querySelector('[data-hcheck]');
+    if (huntState[id]) { card.classList.add('done'); if(chk) chk.textContent = '✓'; done++; }
+    else { card.classList.remove('done'); if(chk) chk.textContent = ''; }
+  });
+  var bar = document.getElementById('progBar');
+  var cnt = document.getElementById('progCount');
+  if (bar) bar.style.width = Math.round(done/9*100) + '%';
+  if (cnt) cnt.textContent = done + ' / 9 complete';
+}
+refreshHuntUI();
+document.querySelectorAll('.hcard').forEach(function(card) {
+  card.addEventListener('click', function(e) {
+    if (e.target.closest('.hcopy')) return;
+    var id = card.getAttribute('data-hid');
+    huntState[id] = !huntState[id];
+    refreshHuntUI();
+  });
+});
+
+var ham = document.getElementById('ham');
+var mob = document.getElementById('mob');
+if (ham && mob) {
+  ham.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var open = mob.classList.contains('open');
+    mob.classList.toggle('open', !open);
+    ham.classList.toggle('open', !open);
+  });
+  mob.querySelectorAll('a').forEach(function(a) {
+    a.addEventListener('click', function() { mob.classList.remove('open'); ham.classList.remove('open'); });
+  });
+  document.addEventListener('click', function(e) {
+    if (!ham.contains(e.target) && !mob.contains(e.target)) {
+      mob.classList.remove('open'); ham.classList.remove('open');
+    }
+  });
+}
+
+// Intercept all anchor links — prevent external navigation, scroll in-page
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var id = a.getAttribute('href').slice(1);
+    var target = document.getElementById(id);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (mob) { mob.classList.remove('open'); }
+    if (ham) { ham.classList.remove('open'); }
+  });
+});
+
+if ('IntersectionObserver' in window) {
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(en) {
+      if (en.isIntersecting) { en.target.style.opacity='1'; en.target.style.transform='translateY(0)'; obs.unobserve(en.target); }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.path-card,.pcard,.track-card,.hcard,.org-tip,.way-card').forEach(function(el) {
+    el.style.opacity='0'; el.style.transform='translateY(14px)';
+    el.style.transition='opacity .35s ease, transform .35s ease';
+    obs.observe(el);
+  });
+}
+</script>
+</body>
+</html>
